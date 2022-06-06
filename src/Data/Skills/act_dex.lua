@@ -205,11 +205,19 @@ skills["ArcticArmour"] = {
 	statDescriptionScope = "buff_skill_stat_descriptions",
 	castTime = 0,
 	statMap = {
+		["arctic_armour_chill_when_hit_duration"] = {
+			mod("EnemyChillDuration", "BASE", nil),
+			div = 1000,
+		},
 		["new_arctic_armour_physical_damage_taken_when_hit_+%_final"] = {
 			mod("PhysicalDamageTakenWhenHit", "MORE", nil, 0, 0, { type = "Condition", var = "Stationary" }, { type = "GlobalEffect", effectType = "Buff" }),
 		},
 		["new_arctic_armour_fire_damage_taken_when_hit_+%_final"] = {
 			mod("FireDamageTakenWhenHit", "MORE", nil, 0, 0, { type = "Condition", var = "Stationary" }, { type = "GlobalEffect", effectType = "Buff" }),
+		},
+		["arctic_armour_freeze_enemies_when_you_are_hit_%_chance"] = {
+			mod("EnemyFreezeChance", "OVERRIDE", nil, 0, 0, { type = "Limit", limit = 100 }),
+			flag("Condition:ArcticArmourCanFreeze"),
 		},
 	},
 	baseFlags = {
@@ -217,6 +225,8 @@ skills["ArcticArmour"] = {
 		duration = true,
 	},
 	baseMods = {
+		mod("EnemyChillEffect", "BASE", 30),
+		mod("EnemyFreezeDuration", "BASE", 0.35),
 	},
 	qualityStats = {
 		Default = {
