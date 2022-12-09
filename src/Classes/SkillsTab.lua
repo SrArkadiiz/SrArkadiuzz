@@ -83,6 +83,7 @@ local SkillsTabClass = newClass("SkillsTab", "UndoHandler", "ControlHost", "Cont
 	self.build = build
 
 	self.socketGroupList = { }
+	self.fromItemList = { }
 
 	self.sortGemsByDPS = true
 	self.sortGemsByDPSField = "CombinedDPS"
@@ -1232,6 +1233,13 @@ function SkillsTabClass:CreateUndoState()
 		end
 		state.skillSets[skillSetIndex] = newSkillSet
 	end
+	state.fromItemList = { }
+	for _, entry in ipairs(self.fromItemList) do
+		local newEntry = { }
+		newEntry.gem = copyTable(entry.gem, true)
+		newEntry.socketGroup = copyTable(entry.socketGroup, true)
+		t_insert(state.fromItemList, newEntry)
+	end
 	state.skillSetOrderList = copyTable(self.skillSetOrderList)
 	-- Save active socket group for both skillsTab and calcsTab to UndoState
 	state.activeSocketGroup = self.build.mainSocketGroup
@@ -1244,6 +1252,10 @@ function SkillsTabClass:RestoreUndoState(state)
 	wipeTable(self.skillSets)
 	for k, v in pairs(state.skillSets) do
 		self.skillSets[k] = v
+	end
+	wipeTable(self.fromItemList)
+	for _, entry in ipairs(state.fromItemList) do
+		t_insert(self.fromItemList, entry)
 	end
 	wipeTable(self.skillSetOrderList)
 	for k, v in pairs(state.skillSetOrderList) do
