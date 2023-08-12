@@ -771,8 +771,10 @@ skills["DeathWish"] = {
 	preDamageFunc = function(activeSkill, output)
 		if activeSkill.skillPart == 2 then
 			local skillData = activeSkill.skillData
-			skillData.FireBonusMin = output.Life * skillData.selfFireExplosionLifeMultiplier
-			skillData.FireBonusMax = output.Life * skillData.selfFireExplosionLifeMultiplier
+			local life = activeSkill.skillData.targetMinionLife or 0
+
+			activeSkill.skillData.FireBonusMin = life * activeSkill.skillData.selfFireExplosionLifeMultiplier
+			activeSkill.skillData.FireBonusMax = life * activeSkill.skillData.selfFireExplosionLifeMultiplier
 		end
 	end,
 	statMap = {
@@ -803,7 +805,6 @@ skills["DeathWish"] = {
 		area = true,
 	},
 	baseMods = {
-		skill("explodeCorpse", true, { type = "SkillPart", skillPart = 2 }),
 		skill("radius", 10, { type = "SkillPart", skillPart = 2 }),
 		skill("buffMinions", true),
 		skill("buffNotPlayer", true),
