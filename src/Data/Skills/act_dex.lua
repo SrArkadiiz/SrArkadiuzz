@@ -8860,6 +8860,7 @@ skills["ThrownWeapon"] = {
 	},
 	baseMods = {
 		mod("PierceChance", "BASE", 100),
+		mod("ReturnChance", "BASE", 100),
 	},
 	qualityStats = {
 		Default = {
@@ -9779,6 +9780,11 @@ skills["SnappingAdder"] = {
 		},
 		{
 			name = "Returning Projectile",
+		},
+	},
+	statMap = {
+		["quality_display_active_skill_returning_damage_is_gem"] = {
+			-- Display only
 		},
 	},
 	baseFlags = {
