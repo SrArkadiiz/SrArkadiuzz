@@ -9741,6 +9741,10 @@ skills["SupportBrandSupport"] = {
 		["trigger_brand_support_hit_damage_+%_final_vs_branded_enemy"] = {
 			mod("TriggeredDamage", "MORE", nil, 0, 0, { type = "Condition", var = "TargetingBrandedEnemy"}),
 		},
+		["projectile_maximum_range_override"] = {
+			mod("projectile_maximum_range_override", "OVERRIDE", nil),
+		},
+		
 	},
 	addSkillTypes = { SkillType.Brand, },
 	baseMods = {
