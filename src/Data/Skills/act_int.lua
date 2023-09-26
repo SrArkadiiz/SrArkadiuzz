@@ -7301,6 +7301,7 @@ skills["MagmaOrb"] = {
 	},
 	baseMods = {
 		skill("radius", 14),
+		flag("ReturnDoesNotAddDPS"),
 	},
 	qualityStats = {
 		Default = {
@@ -9325,6 +9326,9 @@ skills["Spark"] = {
 		projectile = true,
 		duration = true,
 	},
+	baseMods = {
+		flag("ReturnDoesNotAddDPS"),
+	},
 	qualityStats = {
 		Default = {
 			{ "base_projectile_speed_+%", 1 },
@@ -9405,6 +9409,9 @@ skills["VaalSparkSpiralNova"] = {
 		spell = true,
 		projectile = true,
 		duration = true,
+	},
+	baseMods = {
+		flag("ReturnDoesNotAddDPS"),
 	},
 	qualityStats = {
 		Default = {

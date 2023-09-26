@@ -1694,6 +1694,7 @@ local skills, mod, flag, skill = ...
 #skill MagmaOrb
 #flags spell projectile area chaining
 #baseMod skill("radius", 14)
+#baseMod flag("ReturnDoesNotAddDPS")
 #mods
 
 #skill DamageOverTimeAura
@@ -2099,10 +2100,12 @@ local skills, mod, flag, skill = ...
 
 #skill Spark
 #flags spell projectile duration
+#baseMod flag("ReturnDoesNotAddDPS")
 #mods
 
 #skill VaalSparkSpiralNova
 #flags spell projectile duration
+#baseMod flag("ReturnDoesNotAddDPS")
 #mods
 
 #skill Spellslinger
