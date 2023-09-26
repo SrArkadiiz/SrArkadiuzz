@@ -3307,6 +3307,10 @@ skills["EyeOfWinter"] = {
 		spell = true,
 		projectile = true,
 	},
+	baseMods = {
+		skill("projectileSpeed", 80),
+		skill("duration", 0.33),
+	},
 	qualityStats = {
 		Default = {
 			{ "cold_damage_+%", 1 },
@@ -9744,7 +9748,6 @@ skills["SupportBrandSupport"] = {
 		["projectile_maximum_range_override"] = {
 			mod("projectile_maximum_range_override", "OVERRIDE", nil),
 		},
-		
 	},
 	addSkillTypes = { SkillType.Brand, },
 	baseMods = {

@@ -750,6 +750,8 @@ local skills, mod, flag, skill = ...
 			mod("EyeOfWinterRamp", "BASE", nil)
 		},
 	},
+#baseMod skill("projectileSpeed", 80)
+#baseMod skill("duration", 0.33)
 #mods
 
 #skill Fireball
