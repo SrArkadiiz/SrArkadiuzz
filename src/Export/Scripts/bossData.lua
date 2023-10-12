@@ -135,6 +135,26 @@ local function calcSkillDamage(state)
 					baseDamages["maxChaos"..i] = 1 + statsPerLevel.BaseResolvedValues[j]
 				end
 			end
+			if state.DamageType == "DamageOverTime" then
+				for j, floatStat in ipairs(statsPerLevel.FloatStats) do
+					if floatStat.Id == "base_physical_damage_to_deal_per_minute" then
+						baseDamages["minPhysical"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+						baseDamages["maxPhysical"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+					elseif floatStat.Id == "base_lightning_damage_to_deal_per_minute" then
+						baseDamages["minLightning"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+						baseDamages["maxLightning"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+					elseif floatStat.Id == "base_cold_damage_to_deal_per_minute" then
+						baseDamages["minCold"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+						baseDamages["maxCold"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+					elseif floatStat.Id == "base_fire_damage_to_deal_per_minute" then
+						baseDamages["minFire"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+						baseDamages["maxFire"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+					elseif floatStat.Id == "base_chaos_damage_to_deal_per_minute" then
+						baseDamages["minChaos"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+						baseDamages["maxChaos"..i] = 1 + statsPerLevel.BaseResolvedValues[j] / 60
+					end
+				end
+			end
 		end
 		monsterLevel = skill.statsPerLevel[skill.index].PlayerLevelReq
 		if baseDamages["minPhysical1"] or baseDamages["maxPhysical1"] then
@@ -187,6 +207,7 @@ local function getStat(state, stat)
 	local boss = state.boss
 	if stat == "DamageType" then
 		local DamageType = "Untyped"
+		local isHit = false
 		for _, implicitStat in ipairs(skill.GrantedEffectStatSets.ImplicitStats) do
 			if implicitStat.Id  == "base_is_projectile" then
 				DamageType = "Projectile"
@@ -204,11 +225,20 @@ local function getStat(state, stat)
 		end
 		for _, contextFlag in ipairs(skill.skillData.ActiveSkill.StatContextFlags) do
 			if contextFlag.Id == "AttackHit" then
+				isHit = true
 				DamageType = (DamageType == "Projectile") and "Projectile" or "Melee"
 			elseif contextFlag.Id == "SpellHit" then
+				isHit = true
 				DamageType = (DamageType == "Projectile") and "SpellProjectile" or "Spell"
 			elseif contextFlag.Id  == "Projectile" then
 				DamageType = (DamageType == "Spell") and "SpellProjectile" or "Projectile"
+			end
+		end
+		if not isHit then
+			for _, contextFlag in ipairs(skill.skillData.ActiveSkill.StatContextFlags) do
+				if contextFlag.Id == "DamageOverTime" then
+					return "DamageOverTime"
+				end
 			end
 		end
 		return DamageType
