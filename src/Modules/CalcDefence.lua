@@ -3158,8 +3158,10 @@ function calcs.buildDefenceEstimations(env, actor)
 	if damageCategoryConfig == "DamageOverTime" or enemyDotChance > 0 then
 		output.TotalDegen = output.TotalBuildDegen or 0
 		for _, damageType in ipairs(dmgTypeList) do
+			local source = "Config"
 			local baseVal = tonumber(env.configInput["enemy"..damageType.."Damage"])
 			if baseVal == nil then
+				source = "Default"
 				baseVal = tonumber(env.configPlaceholder["enemy"..damageType.."Damage"]) or 0
 			end
 			if baseVal > 0 then
@@ -3172,6 +3174,7 @@ function calcs.buildDefenceEstimations(env, actor)
 							breakdown.TotalDegen = breakdown.TotalDegen or { 
 								rowList = { },
 								colList = {
+									{ label = "Source", key = "source" },
 									{ label = "Base Type", key = "type" },
 									{ label = "Final Type", key = "type2" },
 									{ label = "Base", key = "base" },
@@ -3181,6 +3184,7 @@ function calcs.buildDefenceEstimations(env, actor)
 								}
 							}
 							t_insert(breakdown.TotalDegen.rowList, {
+								source = source,
 								type = damageType,
 								type2 = damageConvertedType,
 								base = s_format("%.1f", baseVal),
@@ -3191,6 +3195,7 @@ function calcs.buildDefenceEstimations(env, actor)
 							breakdown[damageConvertedType.."EnemyDegen"] = breakdown[damageConvertedType.."EnemyDegen"] or { 
 								rowList = { },
 								colList = {
+									{ label = "Source", key = "source" },
 									{ label = "Base Type", key = "type" },
 									{ label = "Base", key = "base" },
 									{ label = "Taken As Percent", key = "conv" },
@@ -3199,6 +3204,7 @@ function calcs.buildDefenceEstimations(env, actor)
 								}
 							}
 							t_insert(breakdown[damageConvertedType.."EnemyDegen"].rowList, {
+								source = source,
 								type = damageType,
 								base = s_format("%.1f", baseVal),
 								conv = s_format("x %.2f%%", convertPercent),
