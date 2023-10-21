@@ -45,7 +45,25 @@ return {
 		speed = 3510,
 		UberSpeed = 1755,
 		critChance = 0,
+		additionalStats = {
+			uber = {
+				reduceEnemyBlock = 1000,
+				CannotBeEvaded = "flag",
+				reduceEnemyDodge = 1000
+			}
+		},
 		tooltip = "Cannot be Evaded.  Allocating Cosmic Wounds increases Damage by a further 100% (Applied on Uber) and cannot be blocked or dodged"
+	},
+	["Shaper Beam"] = {
+		DamageType = "DamageOverTime",
+		DamageMultipliers = {
+			Lightning = { 12.58958162968, 0 },
+			Cold = { 9.1363649598343, 0 },
+			Fire = { 11.141451836499, 0 }
+		},
+		speed = 1000,
+		critChance = 0,
+		tooltip = "Damage Over Time skill"
 	},
 	["Sirus Meteor"] = {
 		DamageType = "Spell",
@@ -59,6 +77,15 @@ return {
 		speed = 1500,
 		tooltip = "Earlier ones with less walls do less damage. Allocating The Perfect Storm increases Damage by a further 50% (Applied on Uber)"
 	},
+	["Cortex Ground Degen"] = {
+		DamageType = "DamageOverTime",
+		DamageMultipliers = {
+			Physical = { 5.3012106087214, 0 }
+		},
+		speed = 1630,
+		critChance = 0,
+		tooltip = "Damage Over Time skill"
+	},
 	["Exarch Ball"] = {
 		DamageType = "SpellProjectile",
 		DamageMultipliers = {
@@ -66,7 +93,19 @@ return {
 		},
 		speed = 1000,
 		critChance = 0,
-		tooltip = "Spawns 8-18 waves of balls depending on which fight and which ball phase"
+		additionalStats = {
+			base = {
+				CannotBeBlocked = "flag",
+				CannotBeSuppressed = "flag",
+				CannotBeDodged = "flag"
+			},
+			uber = {
+				CannotBeBlocked = "flag",
+				CannotBeSuppressed = "flag",
+				CannotBeDodged = "flag"
+			}
+		},
+		tooltip = "Spawns 8-18 waves of balls depending on which fight and which ball phase, Cannot be Blocked, Dodged, or Suppressed"
 	},
 	["Eater Beam"] = {
 		DamageType = "Spell",
@@ -92,7 +131,7 @@ return {
 		tooltip = "Allocating Throw the Gauntlet increases Damage by a further 100% (Applied on Uber) and causes the fireball to have 30 ^xB97123Fire^7 penetration (Applied on Uber)"
 	},
 	["Maven Memory Game"] = {
-		DamageType = "Melee",
+		DamageType = "Spell",
 		DamageMultipliers = {
 			Lightning = { 34.763635149472, 0.17381817574736 },
 			Cold = { 34.763635149472, 0.17381817574736 },
@@ -100,14 +139,28 @@ return {
 		},
 		UberDamageMultiplier = 1.0086206896552,
 		speed = 7500,
-		tooltip = "Is three separate hits, and has a large DoT effect.  Neither is taken into account here.  \n	i.e. Hits before death should be more than 3 to survive"
+		additionalStats = {
+			base = {
+				CannotBeBlocked = "flag",
+				CannotBeSuppressed = "flag",
+				CannotBeDodged = "flag"
+			},
+			uber = {
+				CannotBeBlocked = "flag",
+				CannotBeSuppressed = "flag",
+				CannotBeDodged = "flag"
+			}
+		},
+		tooltip = "Cannot be Blocked, Dodged, or Suppressed. \n	It is three separate hits, and has a large DoT effect.  Neither is taken into account here.  \n		i.e. Hits before death should be more than 3 to survive"
 	},
 },{
     { val = "None", label = "None" },
     { val = "Atziri Flameblast", label = "Atziri Flameblast" },
     { val = "Shaper Ball", label = "Shaper Ball" },
     { val = "Shaper Slam", label = "Shaper Slam" },
+    { val = "Shaper Beam", label = "Shaper Beam" },
     { val = "Sirus Meteor", label = "Sirus Meteor" },
+    { val = "Cortex Ground Degen", label = "Cortex Ground Degen" },
     { val = "Exarch Ball", label = "Exarch Ball" },
     { val = "Eater Beam", label = "Eater Beam" },
     { val = "Maven Fireball", label = "Maven Fireball" },
