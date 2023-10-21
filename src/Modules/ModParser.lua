@@ -3757,6 +3757,8 @@ local specialModList = {
 	["right ring slot: your shocking skitterbot's aura applies socketed h?e?x? ?curse instead"] = { flag("SkitterbotsCannotShock", { type = "SlotNumber", num = 2 }) },
 	["projectiles from spells cannot pierce"] = { flag("CannotPierce", nil, ModFlag.Spell) },
 	["projectiles fork"] = { flag("ForkOnce", nil, ModFlag.Projectile), mod("ForkCountMax", "BASE", 1, nil, ModFlag.Projectile) },
+	["projectiles return to you"] = { mod("ReturnChance", "BASE", 100, nil, ModFlag.Projectile) },
+	["returning projectiles have (%d+)%% increased speed"] = function(num) return { mod("ProjectileSpeed", "INC", num, nil, 0, 0, { type = "Condition", var = "ReturningProjectile" }), } end,
 	["(%d+)%% increased critical strike chance with arrows that fork"] = function(num) return {
 		mod("CritChance", "INC", num, nil, ModFlag.Bow, { type = "StatThreshold", stat = "ForkRemaining", threshold = 1 }, { type = "StatThreshold", stat = "PierceCount", threshold = 0, upper = true }) }
 	end,

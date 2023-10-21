@@ -3307,6 +3307,10 @@ skills["EyeOfWinter"] = {
 		spell = true,
 		projectile = true,
 	},
+	baseMods = {
+		skill("projectileSpeed", 80),
+		skill("duration", 0.33),
+	},
 	qualityStats = {
 		Default = {
 			{ "cold_damage_+%", 1 },
@@ -7304,6 +7308,7 @@ skills["MagmaOrb"] = {
 	},
 	baseMods = {
 		skill("radius", 14),
+		flag("ReturnDoesNotAddDPS"),
 	},
 	qualityStats = {
 		Default = {
@@ -9329,6 +9334,9 @@ skills["Spark"] = {
 		projectile = true,
 		duration = true,
 	},
+	baseMods = {
+		flag("ReturnDoesNotAddDPS"),
+	},
 	qualityStats = {
 		Default = {
 			{ "base_projectile_speed_+%", 1 },
@@ -9409,6 +9417,9 @@ skills["VaalSparkSpiralNova"] = {
 		spell = true,
 		projectile = true,
 		duration = true,
+	},
+	baseMods = {
+		flag("ReturnDoesNotAddDPS"),
 	},
 	qualityStats = {
 		Default = {
@@ -9737,6 +9748,9 @@ skills["SupportBrandSupport"] = {
 		},
 		["trigger_brand_support_hit_damage_+%_final_vs_branded_enemy"] = {
 			mod("TriggeredDamage", "MORE", nil, 0, 0, { type = "Condition", var = "TargetingBrandedEnemy"}),
+		},
+		["projectile_maximum_range_override"] = {
+			mod("projectile_maximum_range_override", "OVERRIDE", nil),
 		},
 	},
 	addSkillTypes = { SkillType.Brand, },
