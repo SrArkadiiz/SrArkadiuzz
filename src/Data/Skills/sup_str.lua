@@ -581,6 +581,9 @@ skills["SupportBrutalityPlus"] = {
 		["support_brutality_physical_damage_+%_final"] = {
 			mod("PhysicalDamage", "MORE", nil),
 		},
+		["chance_to_crush_on_hit_%"] = {
+			mod("CrushChance", "BASE", nil),
+		},
 	},
 	qualityStats = {
 		Default = {
@@ -2233,6 +2236,9 @@ skills["SupportFortify"] = {
 	excludeSkillTypes = { SkillType.Triggered, },
 	statDescriptionScope = "gem_stat_descriptions",
 	statMap = {
+		["chance_to_fortify_on_melee_hit_+%"] = {
+			mod("FortifyChance", "BASE", nil, ModFlag.MeleeHit),
+		},
 		["support_fortify_melee_damage_+%_final"] = {
 			mod("Damage", "MORE", nil, ModFlag.Melee),
 		},
