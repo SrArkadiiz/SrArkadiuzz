@@ -255,7 +255,7 @@ function CalcBreakdownClass:AddModSection(sectionData, modList)
 	local build = self.calcsTab.build
 
 	-- Build list of modifiers to display
-	local cfg = (sectionData.cfg and actor.mainSkill[sectionData.cfg.."Cfg"] and copyTable(actor.mainSkill[sectionData.cfg.."Cfg"], true)) or { }
+	local cfg = (sectionData.cfg and type(sectionData.cfg) == "table" and copyTable(sectionData.cfg, true)) or (sectionData.cfg and actor.mainSkill[sectionData.cfg.."Cfg"] and copyTable(actor.mainSkill[sectionData.cfg.."Cfg"], true)) or { }
 	cfg.source = sectionData.modSource
 	cfg.actor = sectionData.actor
 	local rowList

@@ -444,6 +444,7 @@ local skills, mod, flag, skill = ...
 #skill CorruptingFever
 #flags spell duration
 #baseMod skill("debuff", true)
+#baseMod skill("primaryDurIsBuff", true),
 #baseMod flag("dotIsCorruptingBlood")
 #baseMod mod("Multiplier:CorruptingFeverMaxStages", "BASE", 10)
 #baseMod mod("Damage", "MORE", 100, ModFlag.Dot, 0, { type = "Multiplier", var = "CorruptingFeverStageAfterFirst"})
@@ -508,6 +509,8 @@ local skills, mod, flag, skill = ...
 		"AxisEliteSoldierDominatingBlow",
 		"AxisEliteSoldierDominatingBlowVaal",
 	},
+#baseMod skill("debuff", true)
+#baseMod skill("debuffPrimary", true)
 #mods
 
 #skill VaalDomination
@@ -523,7 +526,7 @@ local skills, mod, flag, skill = ...
 #mods
 
 #skill PuresteelBanner
-#flags spell
+#flags spell area duration aura banner
 	statMap = {
 		["puresteel_banner_accuracy_rating_+%_final"] = {
 			mod("Accuracy", "MORE", nil, 0, 0, { type = "GlobalEffect", effectType = "AuraDebuff" }),
@@ -2077,7 +2080,7 @@ local skills, mod, flag, skill = ...
 #mods
 
 #skill BloodstainedBanner
-#flags spell
+#flags spell area duration aura banner
 	statMap = {
 		["accuracy_rating_+%"] = {
 			mod("Accuracy", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Aura" })

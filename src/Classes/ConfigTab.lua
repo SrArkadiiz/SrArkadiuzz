@@ -488,6 +488,17 @@ local ConfigTabClass = newClass("ConfigTab", "UndoHandler", "ControlHost", "Cont
 			if varData.tooltipFunc then
 				control.tooltipFunc = varData.tooltipFunc
 			end
+			if varData.removeBox then
+				t_insert(self.controls, new("ButtonControl", {"LEFT",control,"RIGHT"}, 4, 0, 20, 20, "x", function()
+					self:AddUndoState()
+					control.shown = false
+					self:BuildModList()
+					self.build.buildFlag = true
+					self.input[varData.var] = varData.defaultState
+					self:UpdateControls()
+				end))
+			end
+			
 			local labelControl = control
 			if varData.label and varData.type ~= "check" then
 				labelControl = new("LabelControl", {"RIGHT",control,"LEFT"}, -4, 0, 0, DrawStringWidth(14, "VAR", varData.label) > 228 and 12 or 14, "^7"..varData.label)
@@ -499,6 +510,8 @@ local ConfigTabClass = newClass("ConfigTab", "UndoHandler", "ControlHost", "Cont
 				self.varControls[varData.var] = control
 				self.placeholder[varData.var] = varData.defaultPlaceholderState
 				control.placeholder = varData.defaultPlaceholderState
+				control.noSave = varData.noSave
+				control.saveShown = varData.saveShown
 				if varData.defaultIndex then
 					self.input[varData.var] = varData.list[varData.defaultIndex].val
 					control.selIndex = varData.defaultIndex
@@ -515,65 +528,77 @@ local ConfigTabClass = newClass("ConfigTab", "UndoHandler", "ControlHost", "Cont
 					self.defaultState[varData.var] = varData.defaultState
 				end
 			end
-
-			local innerShown = control.shown
-			if not varData.doNotHighlight then
-				control.borderFunc = function()
-					local shown = type(innerShown) == "boolean" and innerShown or innerShown()
-					local cur = self.input[varData.var]
-					local def = self:GetDefaultState(varData.var, type(cur))
-					if cur ~= nil and cur ~= def then
-						if not shown then
-							return 	0.753, 0.502, 0.502
+			
+			if varData.defaultHidden then
+				control.shown = false
+			else
+				local innerShown = control.shown
+				if not varData.doNotHighlight then
+					control.borderFunc = function()
+						local shown = type(innerShown) == "boolean" and innerShown or innerShown()
+						local cur = self.input[varData.var]
+						local def = self:GetDefaultState(varData.var, type(cur))
+						if cur ~= nil and cur ~= def then
+							if not shown then
+								return 	0.753, 0.502, 0.502
+							end
+							return 	0.451, 0.576, 0.702
 						end
-						return 	0.451, 0.576, 0.702
+						return 0.5, 0.5, 0.5
 					end
-					return 0.5, 0.5, 0.5
+				end
+				if not varData.hideIfInvalid then
+					control.shown = function()
+						if not searchMatch(varData) then
+							return false
+						end
+						local shown = type(innerShown) == "boolean" and innerShown or innerShown()
+						local cur = self.input[varData.var]
+						local def = self:GetDefaultState(varData.var, type(cur))
+						return not shown and cur ~= nil and cur ~= def or shown
+					end
+					local innerLabel = labelControl.label
+					labelControl.label = function()
+						local shown = type(innerShown) == "boolean" and innerShown or innerShown()
+						local cur = self.input[varData.var]
+						local def = self:GetDefaultState(varData.var, type(cur))
+						if not shown and cur ~= nil and cur ~= def then
+							return colorCodes.NEGATIVE..StripEscapes(innerLabel)
+						end
+						local innerLabel = labelControl.label
+						labelControl.label = function()
+							local shown = type(innerShown) == "boolean" and innerShown or innerShown()
+							local cur = self.input[varData.var]
+							local def = self:GetDefaultState(varData.var, type(cur))
+							if not shown and cur ~= nil and cur ~= def then
+								return colorCodes.NEGATIVE..StripEscapes(innerLabel)
+							end
+							return innerLabel
+						end
+						local innerTooltipFunc = control.tooltipFunc
+						control.tooltipFunc = function (tooltip, ...)
+							tooltip:Clear()
+		
+							if innerTooltipFunc then
+								innerTooltipFunc(tooltip, ...)
+							else
+								local tooltipText = control:GetProperty("tooltipText")
+								if tooltipText and tooltipText ~= '' then
+									tooltip:AddLine(14, tooltipText)
+								end
+							end
+		
+							local shown = type(innerShown) == "boolean" and innerShown or innerShown()
+							local cur = self.input[varData.var]
+							local def = self:GetDefaultState(varData.var, type(cur))
+							if not shown and cur ~= nil and cur ~= def then
+								tooltip:AddLine(14, colorCodes.NEGATIVE.."This config option is conditional with missing source and is invalid.")
+							end
+						end
+					end
 				end
 			end
-
-			if not varData.hideIfInvalid then
-				control.shown = function()
-					if not searchMatch(varData) then
-						return false
-					end
-					local shown = type(innerShown) == "boolean" and innerShown or innerShown()
-					local cur = self.input[varData.var]
-					local def = self:GetDefaultState(varData.var, type(cur))
-					return not shown and cur ~= nil and cur ~= def or shown
-				end
-				local innerLabel = labelControl.label
-				labelControl.label = function()
-					local shown = type(innerShown) == "boolean" and innerShown or innerShown()
-					local cur = self.input[varData.var]
-					local def = self:GetDefaultState(varData.var, type(cur))
-					if not shown and cur ~= nil and cur ~= def then
-						return colorCodes.NEGATIVE..StripEscapes(innerLabel)
-					end
-					return innerLabel
-				end
-				local innerTooltipFunc = control.tooltipFunc
-				control.tooltipFunc = function (tooltip, ...)
-					tooltip:Clear()
-
-					if innerTooltipFunc then
-						innerTooltipFunc(tooltip, ...)
-					else
-						local tooltipText = control:GetProperty("tooltipText")
-						if tooltipText and tooltipText ~= '' then
-							tooltip:AddLine(14, tooltipText)
-						end
-					end
-
-					local shown = type(innerShown) == "boolean" and innerShown or innerShown()
-					local cur = self.input[varData.var]
-					local def = self:GetDefaultState(varData.var, type(cur))
-					if not shown and cur ~= nil and cur ~= def then
-						tooltip:AddLine(14, colorCodes.NEGATIVE.."This config option is conditional with missing source and is invalid.")
-					end
-				end
-			end
-
+			
 			t_insert(self.controls, control)
 			t_insert(lastSection.varControlList, control)
 		end
@@ -583,6 +608,13 @@ end)
 
 function ConfigTabClass:Load(xml, fileName)
 	for _, node in ipairs(xml) do
+		local control = nil
+		if node.attrib.name then
+			control = self.varControls[node.attrib.name]
+			if control.showIfLoaded then
+				control.shown = true
+			end
+		end
 		if node.elem == "Input" then
 			if not node.attrib.name then
 				launch:ShowErrMsg("^1Error parsing '%s': 'Input' element missing name attribute", fileName)
@@ -620,17 +652,20 @@ function ConfigTabClass:Load(xml, fileName)
 				return true
 			end
 		end
+		if node.attrib.shown == "true" then
+			control.shown = true
+		end
 	end
 	self:BuildModList()
 	self:UpdateControls()
 	self:ResetUndo()
 end
 
-function ConfigTabClass:GetDefaultState(var, varType)
+function ConfigTabClass:GetDefaultState(var, val)
 	if self.placeholder[var] ~= nil then
 		return self.placeholder[var]
 	end
-
+	
 	if self.defaultState[var] ~= nil then
 		return self.defaultState[var]
 	end
@@ -648,7 +683,7 @@ end
 
 function ConfigTabClass:Save(xml)
 	for k, v in pairs(self.input) do
-		if v ~= self:GetDefaultState(k, type(v)) then
+		if v ~= self:GetDefaultState(k, v) then
 			local child = { elem = "Input", attrib = { name = k } }
 			if type(v) == "number" then
 				child.attrib.number = tostring(v)
@@ -656,6 +691,10 @@ function ConfigTabClass:Save(xml)
 				child.attrib.boolean = tostring(v)
 			else
 				child.attrib.string = tostring(v)
+			end
+			local control = self.varControls[k]
+			if control.saveShown and (type(control.shown) == "function" and control.shown() or control.shown) then
+				child.attrib.shown = "true"
 			end
 			t_insert(xml, child)
 		end
@@ -667,21 +706,27 @@ function ConfigTabClass:Save(xml)
 		else
 			child.attrib.string = tostring(v)
 		end
+		local control = self.varControls[k]
+		if control.saveShown and (type(control.shown) == "function" and control.shown() or control.shown) then
+			child.attrib.shown = "true"
+		end
 		t_insert(xml, child)
 	end
 end
 
 function ConfigTabClass:UpdateControls()
 	for var, control in pairs(self.varControls) do
-		if control._className == "EditControl" then
-			control:SetText(tostring(self.input[var] or ""))
-			if self.placeholder[var] then
-				control:SetPlaceholder(tostring(self.placeholder[var]))
+		if not control.noSave then
+			if control._className == "EditControl" then
+				control:SetText(tostring(self.input[var] or ""))
+				if self.placeholder[var] then
+					control:SetPlaceholder(tostring(self.placeholder[var]))
+				end
+			elseif control._className == "CheckBoxControl" then
+				control.state = self.input[var]
+			elseif control._className == "DropDownControl" then
+				control:SelByValue(self.input[var], "val")
 			end
-		elseif control._className == "CheckBoxControl" then
-			control.state = self.input[var]
-		elseif control._className == "DropDownControl" then
-			control:SelByValue(self.input[var], "val")
 		end
 	end
 end
@@ -806,6 +851,9 @@ function ConfigTabClass:BuildModList()
 					varData.apply(input[varData.var], modList, enemyModList, self.build)
 				end
 			end
+		end
+		if varData.noSave then
+			input[varData.var] = nil
 		end
 	end
 end

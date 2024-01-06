@@ -3343,6 +3343,10 @@ local specialModList = {
 	["your damage with hits is lucky"] = { flag("LuckyHits") },
 	["elemental damage with hits is lucky while you are shocked"] = { flag("ElementalLuckHits", { type = "Condition", var = "Shocked" }) },
 	["allies' aura buffs do not affect you"] = { flag("AlliesAurasCannotAffectSelf") },
+	["curse auras from socketed skills also affect you"] = { flag("CurseAurasAlsoAffectYou", { type = "SocketedIn", slotName = "{SlotName}" }) },
+	["hexes applied by socketed curse skills are reflected back to you"] = { flag("HexesAreReflectedToYou", { type = "SocketedIn", slotName = "{SlotName}" }) },
+	["hex reflection"] = { flag("HexesAreReflectedAwayFromYou") },
+	["your elemental resistances cannot be lowered by curses"] = { mod("CurseModFilter", "LIST", { pattern = "[efcl][lio][erlg][medh][et]?n?[ti]?[an]?[lg]?resist" }) },
 	["(%d+)%% increased effect of non%-curse auras from your skills on enemies"] = function(num) return {
 		mod("DebuffEffect", "INC", num, { type = "SkillType", skillType = SkillType.Aura }, { type = "SkillType", skillType = SkillType.AppliesCurse, neg = true }),
 		mod("AuraEffect", "INC", num, { type = "SkillName", skillName = "Death Aura" }),
@@ -3352,7 +3356,8 @@ local specialModList = {
 	["you can apply an additional curse while affected by malevolence"] = { mod("EnemyCurseLimit", "BASE", 1, { type = "Condition", var = "AffectedByMalevolence" }) },
 	["you can apply an additional curse while at maximum power charges"] = { mod("EnemyCurseLimit", "BASE", 1, { type = "StatThreshold", stat = "PowerCharges", thresholdStat = "PowerChargesMax" }) },
 	["you can apply one fewer curse"] = { mod("EnemyCurseLimit", "BASE", -1) },
-	["curses on enemies in your chilling areas have (%d+)%% increased effect"] = function(num) return { mod("CurseEffect", "INC", num, { type = "ActorCondition", actor = "enemy", var = "InChillingArea" }) } end,
+	["an additional curse can be applied to you"] = { mod("SelfCurseLimit", "BASE", 1) },
+	["curses on enemies in your chilling areas have (%d+)%% increased effect"] = function(num) return { mod("CurseEffect", "INC", num, { type = "ActorCondition", actor = "enemy", var = "InChillingArea" } ) } end,
 	["hexes you inflict have their effect increased by twice their doom instead"] = { mod("DoomEffect", "MORE", 100) },
 	["nearby enemies have an additional (%d+)%% chance to receive a critical strike"] = function(num) return { mod("EnemyModifier", "LIST", { mod = mod("SelfExtraCritChance", "BASE", num) }) } end,
 	["nearby enemies have (%-%d+)%% to all resistances"] = function(num) return {
@@ -3391,6 +3396,7 @@ local specialModList = {
 		mod("ExtraCurse", "LIST", { skillId = gemIdLookup[skill], level = 1, applyToPlayer = true }),
 		mod("CurseEffectOnSelf", "INC", tonumber(num), { type = "SkillName", skillName = string.gsub(" "..skill, "%W%l", string.upper):sub(2) }),
 	} end,
+	["enemy hits inflict temporal chains on you"] = { mod("ExtraCurse", "LIST", { skillId = "TemporalChains", level = 1, applyToPlayer = true }, { type = "Condition", var = "BeenHitRecently" }) },
 	["you count as on low life while you are cursed with vulnerability"] = { flag("Condition:LowLife", { type = "Condition", var = "AffectedByVulnerability" }) },
 	["you count as on full life while you are cursed with vulnerability"] = { flag("Condition:FullLife", { type = "Condition", var = "AffectedByVulnerability" }) },
 	["if you consumed a corpse recently, you and nearby allies regenerate (%d+)%% of life per second"] = function (num) return { mod("ExtraAura", "LIST", { mod = mod("LifeRegenPercent", "BASE", num) }, { type = "Condition", var = "ConsumedCorpseRecently" }) } end,
@@ -3566,7 +3572,7 @@ local specialModList = {
 	["nearby enemies are covered in ash"] = { mod("CoveredInAshEffect", "BASE", 20) },
 	["enemies near targets you shatter have (%d+)%% chance to be covered in frost for (%d+) seconds"] = { mod("CoveredInFrostEffect", "BASE", 20, { type = "Condition", var = "ShatteredEnemyRecently" }) },
 	["([%a%s]+) has (%d+)%% increased effect"] = function(_, skill, num) return { mod("BuffEffect", "INC", num, { type = "SkillId", skillId = gemIdLookup[skill]}) } end,
-	["debuffs on you expire (%d+)%% faster"] = function(num) return { mod("SelfDebuffExpirationRate", "BASE", num) } end,
+	["debuffs on you expire (%d+)%% faster"] = function(num) return {mod("EffectExpiresFaster", "INC", num, 0, 0, {type = "SkillCondition", debuff = true}),} end,
 	["warcries debilitate enemies for (%d+) seconds?"] = { mod("DebilitateChance", "BASE", 100) },
 	["debilitate enemies for (%d+) seconds? when you suppress their spell damage"] = { mod("DebilitateChance", "BASE", 100) },
 	["debilitate nearby enemies for (%d+) seconds? when f?l?a?s?k? ?effect ends"] = { mod("DebilitateChance", "BASE", 100) },
@@ -4322,6 +4328,10 @@ local specialModList = {
 	["(%d+)%% increased effect of jewel socket passive skills containing corrupted magic jewels, if not from cluster jewels"] = function(num) return { mod("JewelData", "LIST", { key = "corruptedMagicJewelIncEffect", value = num }) } end,
 	["(%d+)%% increased effect of jewel socket passive skills containing corrupted magic jewels"] = function(num) return { mod("JewelData", "LIST", { key = "corruptedMagicJewelIncEffect", value = num }) } end,
 	-- Misc
+	["gain shaper's presence for 10 seconds when you kill a rare or unique enemy"] = {
+		flag("Condition:CanGainShaperPresence", { type = "Condition", var = "KilledUniqueEnemy" }),
+		mod("ExtraAura", "LIST", { onlyAllies = true, mod = mod("EffectExpiresFaster", "INC", -20)}, { type = "Condition", var = "ShaperPresence" }, { type = "SkillCondition", buff = true, debuff = true}),
+	},
 	["can't use chest armour"] = { mod("CanNotUseBody", "Flag", 1, { type = "DisablesItem", slotName = "Body Armour" }) },
 	--["can't use helmets"] = { mod("CanNotUseHelmet", "Flag", 1, { type = "DisablesItem", slotName = "Helmet" }) }, -- this one does not work due to being on a passive?
 	["can't use helmet"] = { mod("CanNotUseHelmet", "Flag", 1, { type = "DisablesItem", slotName = "Helmet" }) }, -- this is to allow for custom mod without saying the other is parsed
@@ -4973,7 +4983,7 @@ local flagTypes = {
 	["chilled"] = "Condition:Chilled",
 	["blinded"] = "Condition:Blinded",
 	["no life regeneration"] = "NoLifeRegen",
-	["hexproof"] = { name = "CurseEffectOnSelf", value = -100, type = "MORE" },
+	["hexproof"] = "Condition:Hexproof",
 	["hindered,? with (%d+)%% reduced movement speed"] = "Condition:Hindered",
 	["unnerved"] = "Condition:Unnerved",
 	["malediction"] = "HasMalediction",

@@ -2441,6 +2441,7 @@ skills["CorruptingFever"] = {
 	},
 	baseMods = {
 		skill("debuff", true),
+		skill("primaryDurIsBuff", true),
 		flag("dotIsCorruptingBlood"),
 		mod("Multiplier:CorruptingFeverMaxStages", "BASE", 10),
 		mod("Damage", "MORE", 100, ModFlag.Dot, 0, { type = "Multiplier", var = "CorruptingFeverStageAfterFirst"}),
@@ -2859,6 +2860,10 @@ skills["DominatingBlow"] = {
 		duration = true,
 		minion = true,
 	},
+	baseMods = {
+		skill("debuff", true),
+		skill("debuffPrimary", true),
+	},
 	qualityStats = {
 		Default = {
 			{ "minion_cooldown_recovery_+%", 2 },
@@ -3112,6 +3117,10 @@ skills["PuresteelBanner"] = {
 	},
 	baseFlags = {
 		spell = true,
+		area = true,
+		duration = true,
+		aura = true,
+		banner = true,
 	},
 	baseMods = {
 		skill("radius", 46),
@@ -11534,6 +11543,10 @@ skills["BloodstainedBanner"] = {
 	},
 	baseFlags = {
 		spell = true,
+		area = true,
+		duration = true,
+		aura = true,
+		banner = true,
 	},
 	baseMods = {
 		skill("radius", 46),

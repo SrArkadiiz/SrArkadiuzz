@@ -110,6 +110,10 @@ skills["Ambush"] = {
 		duration = true,
 		travel = true,
 	},
+	baseMods = {
+		skill("debuff", true),
+		skill("primaryDurIsBuff", true),
+	},
 	qualityStats = {
 		Default = {
 			{ "ambush_additional_critical_strike_chance_permyriad", 50 },
@@ -4100,6 +4104,10 @@ skills["Cyclone"] = {
 		Default = {
 			{ "cyclone_movement_speed_+%_final", 0.5 },
 		},
+		["cyclone_stage_decay_time_ms"] = {
+			skill("duration", nil),
+			div = 1000,
+		},
 	},
 	constantStats = {
 		{ "cyclone_movement_speed_+%_final", -30 },
@@ -4212,9 +4220,11 @@ skills["CycloneAltX"] = {
 		attack = true,
 		melee = true,
 		area = true,
+		duration = true,
 	},
 	baseMods = {
 		skill("radius", 11),
+		mod("Duration", "MORE", 100, 0, 0, { type = "Multiplier", var = "CycloneStageAfterFirst" }),
 	},
 	qualityStats = {
 		Default = {
@@ -5888,7 +5898,7 @@ skills["ExplosiveArrow"] = {
 		local modDB = env.modDB
 		local enemyDB = activeSkill.actor.enemy.modDB
 		local skillModList = activeSkill.skillModList
-		local duration = calcSkillDuration(skillModList, activeSkill.skillCfg, activeSkill.skillData, env, enemyDB)
+		local duration = calcSkillDuration(activeSkill, env, enemyDB)
 		local fuseLimit = skillModList:Sum("BASE", activeSkill.skillCfg, "ExplosiveArrowMaxFuseCount")
 		local activeTotems
 		if activeSkill.skillFlags.totem then
@@ -8119,6 +8129,15 @@ skills["Haste"] = {
 		},
 		["base_movement_velocity_+%"] = {
 			mod("MovementSpeed", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Aura" }),
+		},
+		["summon_totem_cast_speed_+%"] = {
+			mod("TotemPlacementSpeed", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Aura" })
+		},
+		["base_projectile_speed_+%"] = {
+			mod("ProjectileSpeed", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Aura" })
+		},
+		["buff_time_passed_+%_only_buff_category"] = {
+			mod("EffectExpiresFaster", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Aura" }, {type = "SkillCondition", buff = true}),
 		},
 	},
 	baseFlags = {
@@ -12284,6 +12303,7 @@ skills["ShatteringSteelAltX"] = {
 		attack = true,
 		projectile = true,
 		area = true,
+		duration = true,
 	},
 	baseMods = {
 		skill("radius", 28),
@@ -13124,6 +13144,7 @@ skills["SmokeMine"] = {
 		mine = true,
 		area = true,
 		buff = true,
+		duration = true,
 	},
 	baseMods = {
 		skill("radius", 18),
@@ -14496,7 +14517,7 @@ skills["TemporalChains"] = {
 			mod("TemporalChainsActionSpeed", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Curse" }, { type = "Condition", var = "RareOrUnique", neg = true }),
 		},
 		["buff_time_passed_+%_other_than_temporal_chains"] = {
-			mod("BuffExpireFaster", "MORE", nil, 0, 0, { type = "GlobalEffect", effectType = "Curse" }),
+			mod("EffectExpiresFaster", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Curse" }, { type = "SkillCondition", buff = true, debuff = true}, { type = "SkillName", skillName = "Temporal Chains", neg = true }),
 		},
 		["curse_effect_+%_final_vs_players"] = {
 			mod("CurseEffectAgainstPlayer", "MORE", nil),
@@ -16177,6 +16198,9 @@ skills["TemporalRift"] = {
 		["debuff_time_passed_+%"] = {
 			mod("SelfDebuffExpirationRate", "BASE", nil, 0, 0, { type = "GlobalEffect", effectType = "Buff" })
 		},
+		["debuff_time_passed_+%"] = {
+			mod("EffectExpiresFaster", "INC", nil, 0, 0, { type = "GlobalEffect", effectType = "Buff" }, {type = "SkillCondition", debuff = true}),
+		}
 	},
 	baseFlags = {
 		spell = true,
@@ -16259,6 +16283,10 @@ skills["Tornado"] = {
 		duration = true,
 		physical = true,
 		area = true,
+	},
+	baseMods = {
+		skill("debuff", true),
+		skill("debuffPrimary", true),
 	},
 	qualityStats = {
 		Default = {

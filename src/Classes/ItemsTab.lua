@@ -3372,7 +3372,7 @@ function ItemsTabClass:AddItemTooltip(tooltip, item, slot, dbMode)
 		local flaskData = item.flaskData
 		local modDB = self.build.calcsTab.mainEnv.modDB
 		local output = self.build.calcsTab.mainOutput
-		local durInc = modDB:Sum("INC", nil, "FlaskDuration")
+		local durInc = (1 + modDB:Sum("INC", nil, "FlaskDuration") / 100) / m_max(data.misc.BuffExpirationSlowCap, calcLib.mod(modDB, {skillGrantsBuff = true}, "EffectExpiresFaster"))
 		local effectInc = modDB:Sum("INC", { actor = "player" }, "FlaskEffect")
 		local lifeDur = 0
 		local manaDur = 0
@@ -3464,8 +3464,8 @@ function ItemsTabClass:AddItemTooltip(tooltip, item, slot, dbMode)
 				end
 			end
 		else
-			if durInc ~= 0 then
-				t_insert(stats, s_format("^8Flask effect duration: ^7%.1f0s", flaskData.duration * (1 + durInc / 100)))
+			if durInc ~= 1 then
+				t_insert(stats, s_format("^8Flask effect duration: ^7%.1f0s", flaskData.duration * durInc))
 			end
 		end
 		local effectMod = 1 + (flaskData.effectInc + effectInc) / 100

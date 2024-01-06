@@ -689,45 +689,76 @@ Huge sets the radius to 11.
 	{ var = "PvpScaling", type = "check", label = "PvP damage scaling in effect", tooltip = "'Hall of Grandmasters'", apply = function(val, modList, enemyModList)
 		modList:NewMod("HasPvpScaling", "FLAG", true, "Config")
 	end },
-	{ label = "Player is cursed by:" },
-	{ var = "playerCursedWithAssassinsMark", type = "count", label = "Assassin's Mark:", tooltip = "Sets the level of Assassin's Mark to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "AssassinsMark", level = val, applyToPlayer = true })
+	{ var = "externalCurseConfig", type = "list", noSave = true, label = "Player is cursed by:", list = {{val=nil,label="Select a Curse..."},{val="Despair",label="Despair"},{val="AssassinsMark",label="Assassin's Mark"},{val="Conductivity",label="Conductivity"},{val="ElementalWeakness",label="Elemental Weakness"},{val="Enfeeble",label="Enfeeble"},{val="Flammability",label="Flammability"},{val="Frostbite",label="Frostbite"},{val="PoachersMark",label="Poacher's Mark"},{val="ProjectileWeakness",label="Projectile Weakness"},{val="Punishment",label="Punishment"},{val="TemporalChains",label="Temporal Chains"},{val="Vulnerability",label="Vulnerability"},{val="WarlordsMark",label="Warlord's Mark"}}, apply = function(val, modList, enemyModList, build)
+		build.configTab.varControls['externalCurseConfig'].selIndex = 1
+		if val then
+			build.configTab.varControls['playerCursedWith' .. val].shown = true
+		end
 	end },
-	{ var = "playerCursedWithConductivity", type = "count", label = "Conductivity:", tooltip = "Sets the level of Conductivity to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "Conductivity", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithAssassinsMark", type = "count", label = "Assassin's Mark:", tooltip = "Sets the level of Assassin's Mark to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithAssassinsMark'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "AssassinsMark", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithDespair", type = "count", label = "Despair:", tooltip = "Sets the level of Despair to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "Despair", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithConductivity", type = "count", label = "Conductivity:", tooltip = "Sets the level of Conductivity to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithConductivity'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "Conductivity", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithElementalWeakness", type = "count", label = "Elemental Weakness:", tooltip = "Sets the level of Elemental Weakness to apply to the player.\nIn mid tier maps, 'of Elemental Weakness' applies level 10.\nIn high tier maps, 'of Elemental Weakness' applies level 15.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "ElementalWeakness", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithDespair", type = "count", label = "Despair:", tooltip = "Sets the level of Despair to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithDespair'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "Despair", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithEnfeeble", type = "count", label = "Enfeeble:", tooltip = "Sets the level of Enfeeble to apply to the player.\nIn mid tier maps, 'of Enfeeblement' applies level 10.\nIn high tier maps, 'of Enfeeblement' applies level 15.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "Enfeeble", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithElementalWeakness", type = "count", label = "Elemental Weakness:", tooltip = "Sets the level of Elemental Weakness to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithElementalWeakness'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "ElementalWeakness", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithFlammability", type = "count", label = "Flammability:", tooltip = "Sets the level of Flammability to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "Flammability", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithEnfeeble", type = "count", label = "Enfeeble:", tooltip = "Sets the level of Enfeeble to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithEnfeeble'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "Enfeeble", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithFrostbite", type = "count", label = "Frostbite:", tooltip = "Sets the level of Frostbite to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "Frostbite", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithFlammability", type = "count", label = "Flammability:", tooltip = "Sets the level of Flammability to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithFlammability'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "Flammability", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithPoachersMark", type = "count", label = "Poacher's Mark:", tooltip = "Sets the level of Poacher's Mark to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "PoachersMark", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithFrostbite", type = "count", label = "Frostbite:", tooltip = "Sets the level of Frostbite to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithFrostbite'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "Frostbite", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithProjectileWeakness", type = "count", label = "Projectile Weakness:", tooltip = "Sets the level of Projectile Weakness to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "ProjectileWeakness", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithPoachersMark", type = "count", label = "Poacher's Mark:", tooltip = "Sets the level of Poacher's Mark to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithPoachersMark'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "PoachersMark", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithPunishment", type = "count", label = "Punishment:", tooltip = "Sets the level of Punishment to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "Punishment", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithProjectileWeakness", type = "count", label = "Projectile Weakness:", tooltip = "Sets the level of Projectile Weakness to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithProjectileWeakness'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "ProjectileWeakness", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithTemporalChains", type = "count", label = "Temporal Chains:", tooltip = "Sets the level of Temporal Chains to apply to the player.\nIn mid tier maps, 'of Temporal Chains' applies level 10.\nIn high tier maps, 'of Temporal Chains' applies level 15.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "TemporalChains", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithPunishment", type = "count", label = "Punishment:", tooltip = "Sets the level of Punishment to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithPunishment'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "Punishment", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithVulnerability", type = "count", label = "Vulnerability:", tooltip = "Sets the level of Vulnerability to apply to the player.\nIn mid tier maps, 'of Vulnerability' applies level 10.\nIn high tier maps, 'of Vulnerability' applies level 15.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "Vulnerability", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithTemporalChains", type = "count", label = "Temporal Chains:", tooltip = "Sets the level of Temporal Chains to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithTemporalChains'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "TemporalChains", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
-	{ var = "playerCursedWithWarlordsMark", type = "count", label = "Warlord's Mark:", tooltip = "Sets the level of Warlord's Mark to apply to the player.", apply = function(val, modList, enemyModList)
-		modList:NewMod("ExtraCurse", "LIST", { skillId = "WarlordsMark", level = val, applyToPlayer = true })
+	{ var = "playerCursedWithVulnerability", type = "count", label = "Vulnerability:", tooltip = "Sets the level of Vulnerability to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithVulnerability'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "Vulnerability", level = val, applyToPlayer = true, configCurse = true })
+		end
+	end },
+	{ var = "playerCursedWithWarlordsMark", type = "count", label = "Warlord's Mark:", tooltip = "Sets the level of Warlord's Mark to apply to the player.", saveShown = true, defaultPlaceholderState = 1, defaultHidden = true, removeBox = true, apply = function(val, modList, enemyModList, build)
+		if build.configTab.varControls['playerCursedWithWarlordsMark'].shown then
+			modList:NewMod("ExtraCurse", "LIST", { skillId = "WarlordsMark", level = val, applyToPlayer = true, configCurse = true })
+		end
 	end },
 
 	-- Section: Combat options
@@ -1429,6 +1460,9 @@ Huge sets the radius to 11.
 	end },
 	{ var = "buffFanaticism", type = "check", label = "Do you have Fanaticism?", ifFlag = "Condition:CanGainFanaticism", tooltip = "This will enable the Fanaticism buff itself. (Grants 75% more cast speed, reduced skill cost, and increased area of effect)", apply = function(val, modList, enemyModList)
 		modList:NewMod("Condition:Fanaticism", "FLAG", true, "Config", { type = "Condition", var = "Combat" }, { type = "Condition", var = "CanGainFanaticism" })
+	end },
+	{ var = "buffShaperPresence", type = "check", label = "Do you have Shaper's Presence?", ifFlag = "Condition:CanGainShaperPresence", tooltip = "This enabled the Shaper's Presence buff. Shaper's Presence causes effects on you and nearby allies to have a 20% slower Expiration rate.", apply = function(val, modList, enemyModList)
+		modList:NewMod("Condition:ShaperPresence", "FLAG", true, "Config", { type = "Condition", var = "Combat" }, { type = "Condition", var = "CanGainShaperPresence" })
 	end },
 	{ var = "multiplierPvpTvalueOverride", type = "count", label = "PvP Tvalue override (ms):", ifFlag = "isPvP", tooltip = "Tvalue in milliseconds. This overrides the Tvalue of a given skill, for instance any with fixed Tvalues, or modified Tvalues", apply = function(val, modList, enemyModList)
 		modList:NewMod("MultiplierPvpTvalueOverride", "BASE", val, "Config", { type = "Condition", var = "Combat" })
