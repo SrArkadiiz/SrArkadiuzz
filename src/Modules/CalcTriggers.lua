@@ -817,9 +817,11 @@ local function defaultTriggerHandler(env, config)
 					--Accuracy and crit chance
 					if source and (source.skillTypes[SkillType.Melee] or source.skillTypes[SkillType.Attack]) and GlobalCache.cachedData["CACHE"][uuid] and not config.triggerOnUse then
 						local sourceHitChance = GlobalCache.cachedData["CACHE"][uuid].HitChance
-						local skillTriggerTime = 1 / output.SkillTriggerRate
-						local sourceRateTime = 1 / output.EffectiveSourceRate
-						output.SkillTriggerRate =  1 / (skillTriggerTime + sourceRateTime / ((sourceHitChance or 0) / 100) - sourceRateTime)
+						if sourceHitChance ~= 100 then
+							local skillTriggerTime = 1 / output.SkillTriggerRate
+							local sourceRateTime = 1 / output.EffectiveSourceRate
+							output.SkillTriggerRate =  1 / (skillTriggerTime + sourceRateTime / ((sourceHitChance or 0) / 100) - sourceRateTime)
+						end
 						if breakdown then
 							t_insert(breakdown.SkillTriggerRate, 3, s_format("x %.0f%% ^8(%s hit chance)", sourceHitChance, source.activeEffect.grantedEffect.name))
 						end
