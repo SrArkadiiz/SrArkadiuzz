@@ -798,67 +798,126 @@ local function defaultTriggerHandler(env, config)
 				elseif actor.mainSkill.skillFlags.globalTrigger and not config.triggeredSkillCond then -- Trigger does not use source rate breakpoints for one reason or another
 					output.SkillTriggerRate = output.EffectiveSourceRate
 				else -- Triggers like Cast on Crit go through simulation to calculate the trigger rate of each skill in the trigger group
-					output.SkillTriggerRate = calcMultiSpellRotationImpact(env, config.triggeredSkillCond and triggeredSkills or {packageSkillDataForSimulation(actor.mainSkill, env)}, output.EffectiveSourceRate, (not actor.mainSkill.skillData.triggeredByBrand and ( triggerCD or triggeredCD ) or 0) / icdr, actor)
-
+					output.SkillTriggerRate, simBreakdown = calcMultiSpellRotationImpact(env, config.triggeredSkillCond and triggeredSkills or {packageSkillDataForSimulation(actor.mainSkill, env)}, output.EffectiveSourceRate, (not actor.mainSkill.skillData.triggeredByBrand and ( triggerCD or triggeredCD ) or 0) / icdr, actor)
+					
 					if breakdown then
 						breakdown.SkillTriggerRate = {
 							s_format("%.2f ^8(%s)", output.EffectiveSourceRate, (actor.mainSkill.skillData.triggeredByBrand and s_format("%s activations per second", source.activeEffect.grantedEffect.name)) or (not trigRate and s_format("%s triggers per second", skillName)) or "Effective source rate"),
 							s_format("/ %.2f ^8(Estimated impact of skill rotation and cooldown alignment)", m_max(output.EffectiveSourceRate / output.SkillTriggerRate, 1)),
+							s_format("= %.2f ^8per second", output.SkillTriggerRate),
 						}
-					end
+						if simBreakdown.extraSimInfo then
+							t_insert(breakdown.SkillTriggerRate, "")
+							t_insert(breakdown.SkillTriggerRate, simBreakdown.extraSimInfo)
+						end
+						breakdown.SimData = {
+							rowList = { },
+							colList = {
+								{ label = "Rate", key = "rate" },
+								{ label = "Skill Name", key = "skillName" },
+								{ label = "Slot Name", key = "slotName" },
+								{ label = "Gem Index", key = "gemIndex" },
+							},
+						}
+						for _, rateData in ipairs(simBreakdown.rates) do
+							local t = { }
+							for str in string.gmatch(rateData.name, "([^_]+)") do
+								t_insert(t, str)
+							end
 
-					if actor.modDB:Flag(nil, "HaveTriggerBots") and actor.mainSkill.skillTypes[SkillType.Spell] then
-						output.SkillTriggerRate = 2 * output.SkillTriggerRate
-						if breakdown then
-							t_insert(breakdown.SkillTriggerRate, 3, "x 2 ^8(Trigger bots effectively cause the skill to trigger twice)")
+							local row = {
+								rate = round(rateData.rate, 2),
+								skillName = t[1],
+								slotName = t[2],
+								gemIndex = t[3],
+							}
+							t_insert(breakdown.SimData.rowList, row)
 						end
 					end
-
-					--Accuracy and crit chance
+					
+					local combinedTriggerChance = 1
+					local totalTriggerChanceBreakdown = {}
+					
+					-- Accuracy and crit chance
 					if source and (source.skillTypes[SkillType.Melee] or source.skillTypes[SkillType.Attack]) and GlobalCache.cachedData["CACHE"][uuid] and not config.triggerOnUse then
 						local sourceHitChance = GlobalCache.cachedData["CACHE"][uuid].HitChance
 						if sourceHitChance ~= 100 then
-							local skillTriggerTime = 1 / output.SkillTriggerRate
-							local sourceRateTime = 1 / output.EffectiveSourceRate
-							output.SkillTriggerRate =  1 / (skillTriggerTime + sourceRateTime / ((sourceHitChance or 0) / 100) - sourceRateTime)
-						end
-						if breakdown then
-							t_insert(breakdown.SkillTriggerRate, 3, s_format("x %.0f%% ^8(%s hit chance)", sourceHitChance, source.activeEffect.grantedEffect.name))
+							combinedTriggerChance = combinedTriggerChance * (sourceHitChance or 0) / 100
+							if breakdown then
+								t_insert(totalTriggerChanceBreakdown, s_format("x %.0f%% ^8(%s hit chance)", sourceHitChance, source.activeEffect.grantedEffect.name))
+							end
 						end
 						if actor.mainSkill.skillData.triggerOnCrit then
 							local onCritChance = actor.mainSkill.skillData.chanceToTriggerOnCrit or (GlobalCache.cachedData["CACHE"][uuid] and GlobalCache.cachedData["CACHE"][uuid].Env.player.mainSkill.skillData.chanceToTriggerOnCrit)
 							config.triggerChance = config.triggerChance or actor.mainSkill.skillData.chanceToTriggerOnCrit or onCritChance
-
+							
 							local sourceCritChance = GlobalCache.cachedData["CACHE"][uuid].CritChance
 							if sourceCritChance ~= 100 then
-								local skillTriggerTime = 1 / output.SkillTriggerRate
-								output.SkillTriggerRate =  1 / (skillTriggerTime + sourceRateTime / (sourceCritChance / 100) - sourceRateTime)
-							end
-							if breakdown then
-								t_insert(breakdown.SkillTriggerRate, 3, s_format("x %.2f%% ^8(%s effective crit chance)", sourceCritChance, source.activeEffect.grantedEffect.name))
+								combinedTriggerChance = combinedTriggerChance * (sourceCritChance or 0) / 100
+								if breakdown then
+									t_insert(totalTriggerChanceBreakdown, s_format("x %.2f%% ^8(%s effective crit chance)", sourceCritChance, source.activeEffect.grantedEffect.name))
+								end
 							end
 						end
 					end
-
-					--Trigger chance
+	
+					-- Trigger chance
 					if config.triggerChance and config.triggerChance ~= 100 then
+						combinedTriggerChance = combinedTriggerChance * config.triggerChance
+						if breakdown then
+							t_insert(totalTriggerChanceBreakdown, s_format("x %.2f%% ^8(chance to trigger)", config.triggerChance))
+						end
+					end
+					
+					-- Combined chance to trigger
+					if combinedTriggerChance ~= 1 then
 						local skillTriggerTime = 1 / output.SkillTriggerRate
 						local sourceRateTime = 1 / output.EffectiveSourceRate
-						output.SkillTriggerRate =  1 / (skillTriggerTime + sourceRateTime / (config.triggerChance / 100) - sourceRateTime)
+						
+						output.SkillTriggerRate =  1 / (skillTriggerTime + sourceRateTime / combinedTriggerChance - sourceRateTime)
 						if breakdown then
-							t_insert(breakdown.SkillTriggerRate, 3, s_format("x %.2f%% ^8(chance to trigger)", config.triggerChance))
-						end
-					end
+							t_insert(breakdown.SkillTriggerRate, "")
+							totalTriggerChanceBreakdown[1] = totalTriggerChanceBreakdown[1]:gsub("^x ", "")
+							for _, line in ipairs(totalTriggerChanceBreakdown) do
+								t_insert(breakdown.SkillTriggerRate, line)
+							end
+							t_insert(breakdown.SkillTriggerRate, s_format("= %.2f%% ^8(combined chance to trigger)", combinedTriggerChance * 100))
+							t_insert(breakdown.SkillTriggerRate, "")
 
+							t_insert(breakdown.SkillTriggerRate, s_format("%.4f ^8(1 / source rate)", sourceRateTime))
+							t_insert(breakdown.SkillTriggerRate, s_format("/ %.4f ^8(combined trigger chance)", combinedTriggerChance))
+							t_insert(breakdown.SkillTriggerRate, s_format("- %.4f ^8(1 / source rate)", sourceRateTime))
+							t_insert(breakdown.SkillTriggerRate, s_format("+ %.4f ^8(1 / simulated rate)", skillTriggerTime))
+							t_insert(breakdown.SkillTriggerRate, s_format("= %.4f ^8(trigger time with applied trigger chance)", 1 / output.SkillTriggerRate))
+							t_insert(breakdown.SkillTriggerRate, s_format("1 / %.4f = %.2f ^8(trigger rate with applied combined trigger chance)", 1 / output.SkillTriggerRate, output.SkillTriggerRate))
+						end
+						
+					end
+					
+					local afterSimEffectsBreakdown = {
+						"",
+						s_format("%.2f", output.SkillTriggerRate)
+					}
+					
 					-- stagesAreOverlaps is the skill part which makes the stages behave as overlaps
 					local hits_per_cast = config.stagesAreOverlaps and env.player.mainSkill.skillPart == config.stagesAreOverlaps and env.player.mainSkill.activeEffect.srcInstance.skillStageCount or 1
 					output.SkillTriggerRate = hits_per_cast * output.SkillTriggerRate
-					if hits_per_cast > 1 then
-						t_insert(breakdown.SkillTriggerRate, 3, s_format("x %.2f ^8(hits per triggered skill cast)", hits_per_cast))
+					if hits_per_cast > 1 and breakdown then
+						t_insert(afterSimEffectsBreakdown, s_format("x %.2f ^8(hits per triggered skill cast)", hits_per_cast))
 					end
-
-					if breakdown then
-						t_insert(breakdown.SkillTriggerRate, s_format("= %.2f ^8per second", output.SkillTriggerRate))
+					
+					if actor.modDB:Flag(nil, "HaveTriggerBots") and actor.mainSkill.skillTypes[SkillType.Spell] then
+						output.SkillTriggerRate = 2 * output.SkillTriggerRate
+						if breakdown then
+							t_insert(afterSimEffectsBreakdown, "x 2 ^8(Trigger bots effectively cause the skill to trigger twice)")
+						end
+					end
+					
+					if #afterSimEffectsBreakdown > 2 and breakdown then
+						for _, line in ipairs(afterSimEffectsBreakdown) do
+							t_insert(breakdown.SkillTriggerRate, line)
+						end
+						t_insert(breakdown.SkillTriggerRate, s_format("= %.2f", output.SkillTriggerRate))
 					end
 				end
 			else
