@@ -114,7 +114,9 @@ function Inflate(data)
 	return zlib.inflate()(data)
 end
 function GetTime()
-	return os.clock() * 10
+	-- os.clock returns cpu time as float in seconds
+	-- SG GetTime https://github.com/PathOfBuildingCommunity/PathOfBuilding-SimpleGraphic/blob/166d251eefa6bf96ee5f6cd022d08410b7023283/engine/system/win/sys_main.cpp#L541
+	return os.clock() * 1000
 end
 function GetScriptPath()
 	return os.getenv("PWD") .. "/src"
