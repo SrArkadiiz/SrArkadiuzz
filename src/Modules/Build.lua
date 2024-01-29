@@ -909,7 +909,7 @@ function buildMode:Save(xml, options)
 		end
 	end
 
-	if options.fullPlayerStat then -- Save all of output
+	if options and options.fullPlayerStat then -- Save all of output
 		local q = {self.calcsTab.mainOutput}
 		while #q > 0 do
 			local current = table.remove(q)
@@ -935,7 +935,7 @@ function buildMode:Save(xml, options)
 
 	if self.calcsTab.mainEnv.minion then
 		local addedMinionStats = {}
-		if options.fullMinionStat then
+		if options and options.fullMinionStat then
 			local q = {self.calcsTab.mainOutput.Minion}
 			while #q > 0 do
 				local current = table.remove(q)
