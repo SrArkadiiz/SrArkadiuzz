@@ -1,4 +1,5 @@
 local function fetchBuilds(path)
+    local lastDLtime = GetTime()
     local co = coroutine.create(function(path)
         if os.getenv("BUILDLINKS") then
             local fileHnd, errMsg = io.open(os.getenv("BUILDLINKS"), "r")
@@ -14,22 +15,29 @@ local function fetchBuilds(path)
                             local filename = line:gsub('%W','')
 
                             -- Load from cache if downloaded already
-                            local fileHnd = io.open((os.getenv("CACHEDIR")  or "/tmp") .. "/" .. filename .. ".xml", "r") 
+                            local fileHnd = io.open((os.getenv("CACHEDIR")  or "/tmp") .. "/" .. filename .. ".xml", "r")
                             if fileHnd then
                                 coroutine.yield({xml = fileHnd:read("*a"), filename = filename, link = line})
                                 fileHnd:close()
                             else
-                                buildSites.DownloadBuild(line, buildSites.websiteList[j], function(isSuccess, data) 
+                                -- Throttle build downloads to 5 per second
+                                local timeSinceLastDL = GetTime() - lastDLtime
+                                if timeSinceLastDL < 200 then
+                                    posix.nanosleep(0, (200 - timeSinceLastDL) * 1000000)
+                                end
+
+                                buildSites.DownloadBuild(line, buildSites.websiteList[j], function(isSuccess, data)
+									lastDLtime = GetTime()
                                     if isSuccess then
                                         local xml = Inflate(common.base64.decode(data:gsub("-","+"):gsub("_","/")))
-                                        coroutine.yield({xml = xml, filename = filename, link = line})
                                         local xmlHnd = io.open((os.getenv("CACHEDIR")  or "/tmp") .. "/" .. filename .. ".xml", "w+")
                                         xmlHnd:write(xml)
                                         xmlHnd:close()
+                                        coroutine.yield({xml = xml, filename = filename, link = line})
                                     else
                                        print("Failed to download build: " .. line)
                                     end
-                                end)     
+                                end)
                             end
                             break
                         elseif j == #buildSites.websiteList then
@@ -57,7 +65,7 @@ local function fetchBuilds(path)
             end
         end
     end)
- 
+
     return function()
         local ok, result = coroutine.resume(co, path)
         if not ok then
@@ -66,7 +74,7 @@ local function fetchBuilds(path)
         return result
     end
  end
- 
+
 
 function buildTable(tableName, values, string)
     string = string or ""
