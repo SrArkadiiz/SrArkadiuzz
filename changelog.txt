@@ -1,3 +1,20 @@
+VERSION[2.39.3][2024/01/26]
+
+--- Fixed Crashes ---
+* Fix crash when sorting gems on a disabled socket group (Paliak)
+* Fix crash when hovering over Buffs section (Wires77)
+
+--- Fixed Bugs ---
+* Fix Utula's Hunger not working with Soul Tether, Legacy of Fury and Exarch Helmet implicit (Peechey)
+
+VERSION[2.39.2][2024/01/25]
+
+--- Fixed Crashes ---
+* Fix crash when using opening wiki for skills granted by items (Peechey)
+* Fix crash when mousing over Strength breakdown when using Flame's Advance (Paliak)
+* Fix crash when hovering over some breakdowns (LocalIdentity)
+
+
 VERSION[2.39.1][2024/01/24]
 
 --- Fixed Crashes ---
