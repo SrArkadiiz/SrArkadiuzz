@@ -30,7 +30,9 @@ then
     for build in $CACHEDIR/*.build
     do
         BASENAME=$(basename "$build")
-        echo "## Savefile Diff for $BASENAME"
-        diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/$BASENAME")
+        DIFFOUTPUT=$(diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/$BASENAME")) || {
+            echo "## Savefile Diff for $BASENAME"
+            echo $DIFFOUTPUT
+        }
     done
 fi
