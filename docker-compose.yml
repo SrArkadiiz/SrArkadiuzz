@@ -19,7 +19,6 @@ services:
     image: ghcr.io/paliak/busted-tests
     environment: #Where in the container the folders are stored
       WORKDIR: /workdir
-      CACHEDIR: /cache
       HOME: /tmp
     container_name: busted-diff
     tty: true
@@ -30,4 +29,3 @@ services:
     working_dir: /workdir
     volumes:
       - ./:/workdir:ro
-      - "${CACHEDIR:-/tmp}:/cache"

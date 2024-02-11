@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Run busted tests
-        run: docker compose up busted-tests --exit-code-from busted-tests
+        run: docker compose run busted-tests
 
   run_build_diff:
     runs-on: ubuntu-latest
@@ -27,14 +27,14 @@ jobs:
       - name: Create cache folder
         run: mkdir /tmp/cache/
       - name: Check if build cache exists
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/cache/
           key: ${{ steps.get-dev-ref.outputs.devref }}
       - name: Make sure cache is readable by docker
         run: chmod -R 777 /tmp/cache
       - name: Run build diff
-        run: CACHEDIR="/tmp/cache" docker compose up busted-diff --exit-code-from busted-diff
+        run: docker compose run -v '/tmp/cache/:/cache' -e 'CACHEDIR=/cache' busted-diff
       - name: Generate artefact
         id: gen-artefact
         run: | 
