@@ -914,15 +914,15 @@ function buildMode:Save(xml, options)
 	end
 
 	if options and options.fullPlayerStat then -- Save all of output
-		local q = {self.calcsTab.mainOutput}
+		local q = {value = self.calcsTab.mainOutput}
 		while #q > 0 do
 			local current = table.remove(q)
-			for key, val in pairs(current) do
+			for key, val in pairs(current.value) do
 				if not addedStatNames[key] then
 					if type(val) ~= "table"  then
-						t_insert(xml, { elem = "PlayerStat", attrib = { stat = key, value = tostring(val) } })
+						t_insert(xml, { elem = "PlayerStat", attrib = { stat = (current.key or "")..key, value = tostring(val) } })
 					elseif key ~= "Minion" then -- Minion stats are processed lower with the MinionStat elem name
-						table.insert(q,val)
+						table.insert(q,{key = key, value = val})
 					end
 					addedStatNames[key] = true
 				end
@@ -938,17 +938,17 @@ function buildMode:Save(xml, options)
 	end
 
 	if self.calcsTab.mainEnv.minion then
-		local addedMinionStats = {}
 		if options and options.fullMinionStat then
-			local q = {self.calcsTab.mainOutput.Minion}
+			local addedMinionStats = {}
+			local q = {value = self.calcsTab.mainOutput.Minion}
 			while #q > 0 do
 				local current = table.remove(q)
-				for key, val in pairs(current) do
+				for key, val in pairs(current.value) do
 					if not addedMinionStats[key] then
 						if type(val) ~= "table" then
-							t_insert(xml, { elem = "MinionStat", attrib = { stat = key, value = tostring(val) } })
+							t_insert(xml, { elem = "MinionStat", attrib = { stat = (current.key or "")..key, value = tostring(val) } })
 						else
-							table.insert(q,val)
+							table.insert(q,{key = key, value = val})
 						end
 						addedMinionStats[key] = true
 					end
