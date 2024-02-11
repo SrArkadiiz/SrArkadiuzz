@@ -1,5 +1,5 @@
 FROM alpine:3.18 as base
-RUN apk add --no-cache curl unzip openssl build-base readline-dev cmake readline-dev git ca-certificates libcurl curl-dev zlib parallel tar 
+RUN apk add --no-cache curl unzip openssl build-base readline-dev cmake readline-dev git ca-certificates libcurl curl-dev zlib parallel tar libxml2-utils
 
 FROM base as buildbase
 WORKDIR /opt

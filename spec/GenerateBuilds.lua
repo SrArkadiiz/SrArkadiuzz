@@ -75,34 +75,11 @@ local function fetchBuilds(path)
     end
  end
 
-
-function buildTable(tableName, values, string)
-    string = string or ""
-    string = string .. tableName .. " = {"
-    for key, value in pairs(values) do
-        if type(value) == "table" then
-            buildTable(key, value, string)
-        elseif type(value) == "boolean" then
-            string = string .. "[\"" .. key .. "\"] = " .. (value and "true" or "false") .. ",\n"
-        elseif type(value) == "string" then
-            string = string .. "[\"" .. key .. "\"] = \"" .. value .. "\",\n"
-        else
-            string = string .. "[\"" .. key .. "\"] = " .. round(value, 4) .. ",\n"
-        end
-    end
-    string = string .. "}\n"
-    return string
-end
-
 for testBuild in fetchBuilds("../spec/TestBuilds") do
 	local filepath = (os.getenv("BUILDCACHEPREFIX") or "/tmp") .. "/" .. testBuild.filename
     print("[+] Computing ".. filepath)
     loadBuildFromXML(testBuild.xml)
     local buildHnd = io.open(filepath .. ".build", "w+")
-    buildHnd:write(build:SaveDB("Cache"))
+    buildHnd:write(build:SaveDB("Cache", {fullPlayerStat = true, fullMinionStat = true}))
     buildHnd:close()
-
-    local outputHnd = io.open(filepath .. ".lua", "w+")
-    outputHnd:write("return {\n " .. buildTable("output", build.calcsTab.mainOutput) .. "\n}")
-    outputHnd:close()
 end

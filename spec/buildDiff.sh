@@ -27,15 +27,10 @@ fi
 
 if [[ -f "/tmp/$headref" ]] # Make sure generating builds for current HEAD was successful
 then
-    for build in $CACHEDIR/*.lua
-    do
-        luajit $WORKDIR/spec/buildOutputDiff.lua /tmp/$(basename "$build") "$build"
-    done
     for build in $CACHEDIR/*.build
     do
         BASENAME=$(basename "$build")
-        echo "[-] Savefile Diff for $BASENAME"
-        diff "$build" "/tmp/$BASENAME"
-        echo "[+] Savefile Diff for $BASENAME"
+        echo "## Savefile Diff for $BASENAME"
+        diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/$BASENAME")
     done
 fi
