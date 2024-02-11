@@ -15,14 +15,14 @@ then
     git restore . && git clean -fd && git checkout origin/dev && \
     cp $WORKDIR/.busted /tmp$WORKDIR/.busted && cp $WORKDIR/src/HeadlessWrapper.lua /tmp$WORKDIR/src/HeadlessWrapper.lua && rm -rf /tmp$WORKDIR/spec/ && cp -r $WORKDIR/spec/ /tmp$WORKDIR/spec/ && \
     cat $WORKDIR/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe -N50 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS=${LINKSBATCH} BUILDCACHEPREFIX=${CACHEDIR} busted --lua=luajit -r generate' && \
-    BUILDCACHEPREFIX=${CACHEDIR} busted --lua=luajit -r generate && date > "$CACHEDIR/$devref" && echo "[+] Build cache computed for $devref" && cd $WORKDIR
+    BUILDCACHEPREFIX=${CACHEDIR} busted --lua=luajit -r generate && date > "$CACHEDIR/$devref" && echo "[+] Build cache computed for $devref (devref)" && cd $WORKDIR
 fi
 
 if [[ -f "$CACHEDIR/$devref" ]] #Make sure cache of dev branch builds exists and matches current dev
 then
     rm -rf /tmp/*
     cat $WORKDIR/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe -N50 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS=${LINKSBATCH} BUILDCACHEPREFIX="/tmp" busted --lua=luajit -r generate' && \
-    BUILDCACHEPREFIX='/tmp' busted --lua=luajit -r generate && date > "/tmp/$headref" && echo "[+] Build cache computed for $headref"
+    BUILDCACHEPREFIX='/tmp' busted --lua=luajit -r generate && date > "/tmp/$headref" && echo "[+] Build cache computed for $headref (headref)"
 fi
 
 if [[ -f "/tmp/$headref" ]] # Make sure generating builds for current HEAD was successful
@@ -31,8 +31,10 @@ then
     do
         BASENAME=$(basename "$build")
         DIFFOUTPUT=$(diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/$BASENAME")) || {
+            echo '```diff'
             echo "## Savefile Diff for $BASENAME"
             echo $DIFFOUTPUT
+            echo '```'
         }
     done
 fi
