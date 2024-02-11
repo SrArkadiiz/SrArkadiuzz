@@ -939,28 +939,23 @@ function buildMode:Save(xml, options)
 
 	if self.calcsTab.mainEnv.minion then
 		if options and options.fullMinionStat then
-			local addedMinionStats = {}
 			local q = {value = self.calcsTab.mainOutput.Minion}
 			while #q > 0 do
 				local current = table.remove(q)
 				for key, val in pairs(current.value) do
-					if not addedMinionStats[key] then
-						if type(val) ~= "table" then
-							t_insert(xml, { elem = "MinionStat", attrib = { stat = (current.key or "")..key, value = tostring(val) } })
-						else
-							table.insert(q,{key = key, value = val})
-						end
-						addedMinionStats[key] = true
+					if type(val) ~= "table" then
+						t_insert(xml, { elem = "MinionStat", attrib = { stat = (current.key or "")..key, value = tostring(val) } })
+					else
+						table.insert(q,{key = key, value = val})
 					end
 				end
 			end
 		else
 			for _, statData in ipairs(self.minionDisplayStats) do
-				if not addedMinionStats[statData.stat] and statData.stat then
+				if statData.stat then
 					local statVal = self.calcsTab.mainOutput.Minion[statData.stat]
 					if statVal then
 						t_insert(xml, { elem = "MinionStat", attrib = { stat = statData.stat, value = tostring(statVal) } })
-						addedMinionStats[statData.stat] = true
 					end
 				end
 			end
@@ -1716,7 +1711,6 @@ function buildMode:SaveDB(fileName, options)
 		return xmlText
 	end
 end
-
 
 function buildMode:SaveDBFile()
 	if not self.dbFileName then
