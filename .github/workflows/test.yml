@@ -35,4 +35,15 @@ jobs:
         run: chmod -R 777 /tmp/cache
       - name: Run build diff
         run: CACHEDIR="/tmp/cache" docker compose up busted-diff --exit-code-from busted-diff
+      - name: Generate artefact
+        id: gen-artefact
+        run: | 
+            docker compose logs --no-log-prefix busted-diff | sed -n '/Savefile Diff for/, $p' > /tmp/artefact
+            echo "difflength=$(wc -l /tmp/artefact | awk '{print $1}')" >> $GITHUB_OUTPUT
+      - name: Upload artefact
+        if: ${{ steps.gen-artefact.outputs.difflength }} != '0'
+        uses: actions/upload-artifact@v4
+        with:
+            name: build-diff-output
+            path: /tmp/artefact
       
