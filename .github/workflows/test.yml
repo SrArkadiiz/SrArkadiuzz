@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Run busted tests
-        run: docker compose run busted-tests
+        run: docker compose run --no-TTY busted-tests
 
   run_build_diff:
     runs-on: ubuntu-latest
@@ -34,10 +34,10 @@ jobs:
       - name: Make sure cache is readable by docker
         run: chmod -R 777 /tmp/cache
       - name: Run build diff
-        run: docker compose run -v '/tmp/cache/:/cache' -e 'CACHEDIR=/cache' busted-diff
+        run: docker compose run -v '/tmp/cache/:/cache' -e 'CACHEDIR=/cache' --no-TTY busted-diff
       - name: Generate artefact
         run: | 
-            docker compose logs --no-log-prefix busted-diff | sed -n '/Savefile Diff for/, $p' > /tmp/artefact
+            docker compose logs --no-log-prefix busted-diff | sed -n '/Savefile Diff for/, $p' | tee /tmp/artefact
             [ -s /tmp/artefact ] || rm /tmp/artefact
       - name: Upload artefact
         uses: actions/upload-artifact@v4

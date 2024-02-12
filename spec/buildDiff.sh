@@ -39,6 +39,8 @@ do
     # Only print the header if there is a diff to display
     DIFFOUTPUT=$(diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/devref/$BASENAME")) || {
         echo "## Savefile Diff for $BASENAME"
-        echo "\`\`\`diff\n${DIFFOUTPUT}\n\`\`\`"
+        echo '```diff'
+        echo $DIFFOUTPUT
+        echo '```'
     }
 done
