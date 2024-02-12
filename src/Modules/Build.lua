@@ -914,7 +914,7 @@ function buildMode:Save(xml, options)
 	end
 
 	if options and options.fullPlayerStat then -- Save all of output
-		local q = {value = self.calcsTab.mainOutput}
+		local q = {{value = self.calcsTab.mainOutput}}
 		while #q > 0 do
 			local current = table.remove(q)
 			for key, val in pairs(current.value) do
@@ -939,7 +939,7 @@ function buildMode:Save(xml, options)
 
 	if self.calcsTab.mainEnv.minion then
 		if options and options.fullMinionStat then
-			local q = {value = self.calcsTab.mainOutput.Minion}
+			local q = {{value = self.calcsTab.mainOutput.Minion}}
 			while #q > 0 do
 				local current = table.remove(q)
 				for key, val in pairs(current.value) do
