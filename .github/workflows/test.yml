@@ -36,12 +36,10 @@ jobs:
       - name: Run build diff
         run: docker compose run -v '/tmp/cache/:/cache' -e 'CACHEDIR=/cache' busted-diff
       - name: Generate artefact
-        id: gen-artefact
         run: | 
             docker compose logs --no-log-prefix busted-diff | sed -n '/Savefile Diff for/, $p' > /tmp/artefact
-            echo "difflength=$(wc -l /tmp/artefact | awk '{print $1}')" >> $GITHUB_OUTPUT
+            [ -s /tmp/artefact ] || rm /tmp/artefact
       - name: Upload artefact
-        if: ${{ steps.gen-artefact.outputs.difflength }} != '0'
         uses: actions/upload-artifact@v4
         with:
             name: build-diff-output
