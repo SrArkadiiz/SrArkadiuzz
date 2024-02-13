@@ -40,7 +40,7 @@ do
     DIFFOUTPUT=$(diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/devref/$BASENAME")) || {
         echo "## Savefile Diff for $BASENAME"
         echo '```diff'
-        echo $DIFFOUTPUT
+        echo "$DIFFOUTPUT"
         echo '```'
     }
 done

@@ -34,10 +34,10 @@ jobs:
       - name: Make sure cache is readable by docker
         run: chmod -R 777 /tmp/cache
       - name: Run build diff
-        run: docker compose run -v '/tmp/cache/:/cache' -e 'CACHEDIR=/cache' --no-TTY busted-diff
+        run: docker compose run -v '/tmp/cache/:/cache' -e 'CACHEDIR=/cache' busted-diff | tee /tmp/dockerlog
       - name: Generate artefact
         run: | 
-            docker compose logs --no-log-prefix busted-diff | sed -n '/Savefile Diff for/, $p' | tee /tmp/artefact
+            sed -n '/Savefile Diff for/, $p' /tmp/dockerlog | tee /tmp/artefact
             [ -s /tmp/artefact ] || rm /tmp/artefact
       - name: Upload artefact
         uses: actions/upload-artifact@v4
