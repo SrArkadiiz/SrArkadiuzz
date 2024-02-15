@@ -964,7 +964,7 @@ function buildMode:Save(xml, options)
 
 	if options and (options.fullPlayerStat or options.fullMinionStat) then
 		table.sort(xml, function(a, b)
-			return a.attrib and b.attrib and (a.elem == "MinionStat" or b.elem == "PlayerStat") and a.attrib.stat < b.attrib.stat
+			return a.attrib and a.attrib.stat and b.attrib and b.attrib.stat and (a.elem == "MinionStat" or b.elem == "PlayerStat") and a.attrib.stat < b.attrib.stat
 		end)
 	end
 
