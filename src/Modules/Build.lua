@@ -962,6 +962,12 @@ function buildMode:Save(xml, options)
 		end
 	end
 
+	if options and (options.fullPlayerStat or options.fullMinionStat) then
+		table.sort(xml, function(a, b)
+			return a.attrib and b.attrib and (a.elem == "MinionStat" or b.elem == "PlayerStat") and a.attrib.stat < b.attrib.stat
+		end)
+	end
+
 	local timelessData = {
 		elem = "TimelessData",
 		attrib = {
