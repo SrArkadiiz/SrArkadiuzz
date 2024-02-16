@@ -24,7 +24,7 @@ BUILDCACHEPREFIX='/tmp/devref' busted --lua=luajit -r generate && date > "/tmp/d
 
 if [[ ! -f "$CACHEDIR/$devref" ]] # Output of builds outdated or nonexistent
 then
-	rm -rf $CACHEDIR/*
+	rm -rf $CACHEDIR/*.build
 
     # Keep new changes to tests related files
     git diff --no-color /tmp/workdir/.busted /tmp/workdir/src/HeadlessWrapper.lua /tmp/workdir/spec/ > /tmp/patch && \
