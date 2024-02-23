@@ -18,9 +18,8 @@ devref=$(git rev-parse origin/dev)
 
 rm -rf /tmp/devref && mkdir /tmp/devref
 rm /tmp/workdir/src/Settings.xml
-cat /tmp/workdir/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS="$LINKSBATCH" BUILDCACHEPREFIX="/tmp/devref" busted --lua=luajit -r generate' && \
+cat /tmp/workdir/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe -N50 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS="$LINKSBATCH" BUILDCACHEPREFIX="/tmp/devref" busted --lua=luajit -r generate' && \
 BUILDCACHEPREFIX='/tmp/devref' busted --lua=luajit -r generate && date > "/tmp/devref/$headref" && echo "[+] Build cache computed for $headref (headref)" || exit $?
-
 
 if [[ ! -f "$CACHEDIR/$devref" ]] # Output of builds outdated or nonexistent
 then
@@ -29,7 +28,7 @@ then
     # Keep new changes to tests related files
     git diff --no-color /tmp/workdir/.busted /tmp/workdir/src/HeadlessWrapper.lua /tmp/workdir/spec/ > /tmp/patch && \
     git reset --hard origin/dev && git clean -fd && git apply --allow-empty /tmp/patch && \
-    cat /tmp/workdir/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS="$LINKSBATCH" BUILDCACHEPREFIX="$CACHEDIR" busted --lua=luajit -r generate' && \
+    cat /tmp/workdir/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe -N50 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS="$LINKSBATCH" BUILDCACHEPREFIX="$CACHEDIR" busted --lua=luajit -r generate' && \
     BUILDCACHEPREFIX="$CACHEDIR" busted --lua=luajit -r generate && date > "$CACHEDIR/$devref" && echo "[+] Build cache computed for $devref (devref)" || exit $?
 fi
 
