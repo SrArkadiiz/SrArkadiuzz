@@ -11,14 +11,8 @@ RUN wget https://luarocks.org/releases/luarocks-3.7.0.tar.gz && tar xf luarocks-
 RUN cd luarocks-3.7.0 && ./configure && make
 
 FROM buildbase as luajit
-# Fetch only the wanted commit
-RUN mkdir LuaJIT && \
-cd LuaJIT && \
-git init && \
-git remote add origin https://github.com/LuaJIT/LuaJIT && \
-git fetch --depth 1 origin d0e88930ddde28ff662503f9f20facf34f7265aa && \
-git checkout FETCH_HEAD && \
-make
+RUN git clone --depth 1 --branch v2.1.0-beta3 https://github.com/LuaJIT/LuaJIT
+RUN cd LuaJIT && make
 
 FROM buildbase as emmyluadebugger
 RUN git clone --depth 1 --branch 1.7.1 https://github.com/EmmyLua/EmmyLuaDebugger
@@ -28,7 +22,7 @@ FROM base
 RUN --mount=type=cache,from=buildBase,source=/opt,target=/opt make -C /opt/lua-5.1.5/ install
 RUN --mount=type=cache,from=luarocks,source=/opt,target=/opt make -C /opt/luarocks-3.7.0/ install
 
-# Install here to install pkgs in pararell with compilation of emmylua and luajit
+#Install here to install pkgs in pararell with compilation of emmylua and luajit
 RUN luarocks install busted
 RUN luarocks install cluacov
 RUN luarocks install Lua-cURL
