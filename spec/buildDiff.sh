@@ -35,10 +35,19 @@ fi
 for build in $CACHEDIR/*.build
 do
     BASENAME=$(basename "$build")
+
     # Only print the header if there is a diff to display
     DIFFOUTPUT=$(diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/devref/$BASENAME")) || {
         echo "## Savefile Diff for $BASENAME"
         echo '```diff'
+        echo "$DIFFOUTPUT"
+        echo '```'
+    }
+
+    # Dedicated output diff
+    DIFFOUTPUT=$(luajit spec/diffOutput.lua "$build" "/tmp/devref/$BASENAME") || {
+        echo "## Output Diff for $BASENAME"
+        echo '```'
         echo "$DIFFOUTPUT"
         echo '```'
     }
