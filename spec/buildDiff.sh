@@ -16,10 +16,10 @@ git config --global --add advice.detachedHead false
 headref=$(git rev-parse HEAD)
 devref=$(git rev-parse origin/dev)
 
-rm -rf /tmp/devref && mkdir /tmp/devref
+rm -rf /tmp/headref && mkdir /tmp/headref
 rm /tmp/workdir/src/Settings.xml
-cat /tmp/workdir/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe -N50 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS="$LINKSBATCH" BUILDCACHEPREFIX="/tmp/devref" busted --lua=luajit -r generate' && \
-BUILDCACHEPREFIX='/tmp/devref' busted --lua=luajit -r generate && date > "/tmp/devref/$headref" && echo "[+] Build cache computed for $headref (headref)" || exit $?
+cat /tmp/workdir/spec/builds.txt | dos2unix | parallel --will-cite --ungroup --pipe -N50 'LINKSBATCH="$(mktemp){#}"; cat > $LINKSBATCH; BUILDLINKS="$LINKSBATCH" BUILDCACHEPREFIX="/tmp/headref" busted --lua=luajit -r generate' && \
+BUILDCACHEPREFIX='/tmp/headref' busted --lua=luajit -r generate && date > "/tmp/headref/$headref" && echo "[+] Build cache computed for $headref (headref)" || exit $?
 
 if [[ ! -f "$CACHEDIR/$devref" ]] # Output of builds outdated or nonexistent
 then
@@ -37,7 +37,7 @@ do
     BASENAME=$(basename "$build")
 
     # Only print the header if there is a diff to display
-    DIFFOUTPUT=$(diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/devref/$BASENAME")) || {
+    DIFFOUTPUT=$(diff <(xmllint --exc-c14n "$build") <(xmllint --exc-c14n "/tmp/headref/$BASENAME")) || {
         echo "## Savefile Diff for $BASENAME"
         echo '```diff'
         echo "$DIFFOUTPUT"
@@ -45,7 +45,7 @@ do
     }
 
     # Dedicated output diff
-    DIFFOUTPUT=$(luajit spec/diffOutput.lua "$build" "/tmp/devref/$BASENAME") || {
+    DIFFOUTPUT=$(luajit spec/diffOutput.lua "$build" "/tmp/headref/$BASENAME") || {
         echo "## Output Diff for $BASENAME"
         echo '```'
         echo "$DIFFOUTPUT"
