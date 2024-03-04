@@ -18,10 +18,10 @@ local function fetchBuilds(path)
                                 coroutine.yield({ xml = fileHnd:read("*a"), filename = filename, link = line })
                                 fileHnd:close()
                             else
-                                -- Throttle build downloads to 5 per second
+                                -- Throttle build downloads to 15 per 10 seconds
                                 local timeSinceLastDL = GetTime() - lastDLtime
-                                if timeSinceLastDL < 200 then
-                                    posix.nanosleep(0, (200 - timeSinceLastDL) * 1000000)
+                                if timeSinceLastDL < 666 then
+                                    posix.nanosleep(0, (666 - timeSinceLastDL) * 1000000)
                                 end
                                 buildSites.DownloadBuild(line, buildSites.websiteList[j], function(isSuccess, data)
                                     lastDLtime = GetTime()
